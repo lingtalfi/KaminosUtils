@@ -23,7 +23,7 @@ How to install?
 Using the [universe naive importer](https://github.com/lingtalfi/universe-naive-importer):
 ```bash
 cd /path/to/app
-uni import Kaminos
+uni import KaminosUtils
 ```
 
 Or otherwise just copy the planet to your planets directory.
