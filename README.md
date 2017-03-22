@@ -7,7 +7,7 @@ WORK iN PROGRESS...
 
 
 
-A planet to help implementating a kaminos application.
+A planet to help implementing the kaminos admin system.
 
 The Kaminos planet is part of the [universe framework](https://github.com/karayabin/universe-snapshot).
 
