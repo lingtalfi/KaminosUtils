@@ -50,6 +50,11 @@ abstract class KaminosModule implements ProgramOutputAwareInterface, ModuleInter
      */
     private $steps;
 
+    /**
+     * Todo
+     */
+    private $stopText2OutputType;
+
 
     public function __construct()
     {
@@ -110,10 +115,22 @@ abstract class KaminosModule implements ProgramOutputAwareInterface, ModuleInter
     protected function startStep($stepId)
     {
         if (array_key_exists($stepId, $this->steps)) {
-
-
+            $label = $this->getStepLabel([$stepId]);
+            $this->getOutput()->notice($label, false);
         } else {
-            throw new KaminosModuleException("step doesn't exist: $stepId");
+            throw new KaminosModuleException("step $stepId doesn't exist");
+        }
+    }
+
+
+    protected function stopStep($stepId, $text = "done")
+    {
+        if (array_key_exists($stepId, $this->steps)) {
+            if ("done" === $text) {
+                $this->getOutput()->success($text);
+            }
+        } else {
+            throw new KaminosModuleException("step $stepId doesn't exist");
         }
     }
 
@@ -132,7 +149,9 @@ abstract class KaminosModule implements ProgramOutputAwareInterface, ModuleInter
     protected function installAuto()
     {
         if (true === $this->usesAutoFiles()) {
+            $this->startStep('files');
             ModuleInstallTool::installFiles($this);
+
         }
     }
 
@@ -169,5 +188,19 @@ abstract class KaminosModule implements ProgramOutputAwareInterface, ModuleInter
         return $this->output;
     }
 
+    private function getStepLabel($stepId)
+    {
+        $n = 0;
+        $label = null;
+        foreach ($this->steps as $id => $label) {
+            $n++;
+            if ($id === $stepId) {
+                break;
+            }
+        }
+        $count = count($this->steps);
+        $msg = "Step $n/$count: $label ... ";
+        return $msg;
+    }
 
 }
