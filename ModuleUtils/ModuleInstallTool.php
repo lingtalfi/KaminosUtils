@@ -8,6 +8,7 @@ use CopyDir\SimpleCopyDirUtil;
 use Kamille\Architecture\ApplicationParameters\ApplicationParameters;
 use Kamille\Module\ModuleInterface;
 use Kamille\Utils\StepTracker\StepTrackerAwareInterface;
+use MethodInjector\MethodInjector;
 
 class ModuleInstallTool
 {
@@ -86,4 +87,21 @@ class ModuleInstallTool
 //            $module->getStepTracker()->stopStep('files');
 //        }
 //    }
+
+
+    public static function bindModuleServices($moduleServicesClassName)
+    {
+//        $className = 'Module\Connexion\ConnexionServices';
+        $o = new MethodInjector();
+        $methods = $o->getMethodsList($moduleServicesClassName);
+        foreach ($methods as $method) {
+            $m = $o->getMethodByName($moduleServicesClassName, $method);
+            if (false === $o->hasMethod($m, 'Services\X')) {
+                $o->appendMethod($m, 'Services\X');
+            }
+        }
+
+
+    }
+
 }

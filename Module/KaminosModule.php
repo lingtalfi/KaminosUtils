@@ -62,6 +62,7 @@ abstract class KaminosModule implements ProgramOutputAwareInterface, ModuleInter
 
         $steps = [];
         $this->collectAutoSteps($steps, 'install');
+
         $this->registerSteps($steps, 'install');
         $this->steps = $steps;
 
@@ -133,32 +134,55 @@ abstract class KaminosModule implements ProgramOutputAwareInterface, ModuleInter
 
     protected function collectAutoSteps(array &$steps, $type)
     {
-        if (true === $this->usesAutoFiles()) {
+        if (true === $this->useAutoFiles()) {
             if ('install' === $type) {
                 $steps['files'] = "Installing files";
             } else {
                 $steps['files'] = "Uninstalling files";
             }
         }
+        if (true === $this->useXServices()) {
+            if ('install' === $type) {
+                $steps['xservices'] = "Installing services";
+            } else {
+                $steps['xservices'] = "Uninstalling services";
+            }
+        }
     }
 
     protected function installAuto()
     {
-        if (true === $this->usesAutoFiles()) {
+        if (true === $this->useAutoFiles()) {
             $this->startStep('files');
             ModuleInstallTool::installFiles($this);
             $this->stopStep('files', "done");
+        }
 
+        if (true === $this->useXServices()) {
+            $this->startStep('xservices');
+            $n = $this->getModuleName();
+            $moduleName = 'Module\\' . $n . '\\' . $n . "Services";
+            ModuleInstallTool::bindModuleServices($moduleName);
+            $this->stopStep('xservices', "done");
         }
     }
 
     //--------------------------------------------
     //
     //--------------------------------------------
-    private function usesAutoFiles()
+    private function useAutoFiles()
     {
         $d = $this->getModuleDir();
         $f = $d . "/files/app";
+        return (file_exists($f));
+    }
+
+
+    private function useXServices()
+    {
+        $d = $this->getModuleDir();
+        $n = $this->getModuleName();
+        $f = $d . "/$n" . "Services.php";
         return (file_exists($f));
     }
 
@@ -167,6 +191,7 @@ abstract class KaminosModule implements ProgramOutputAwareInterface, ModuleInter
     {
         $className = get_called_class();
         $p = explode('\\', $className);
+        array_shift($p); // drop the Module prefix
         return $p[0];
     }
 

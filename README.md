@@ -34,6 +34,11 @@ Or otherwise just copy the planet to your planets directory.
 History Log
 ------------------
     
+- 1.1.0 -- 2017-03-24
+
+    - added ModuleInstallTool.bindModuleServices
+    - added xservices autobinding during module install process
+    
 - 1.0.0 -- 2017-03-22
 
     - initial commit
