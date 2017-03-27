@@ -62,7 +62,6 @@ abstract class KaminosModule implements ProgramOutputAwareInterface, ModuleInter
 
         $steps = [];
         $this->collectAutoSteps($steps, 'install');
-
         $this->registerSteps($steps, 'install');
         $this->steps = $steps;
 
@@ -73,7 +72,13 @@ abstract class KaminosModule implements ProgramOutputAwareInterface, ModuleInter
 
     public function uninstall()
     {
-        // TODO: Implement uninstall() method.
+        $steps = [];
+        $this->collectAutoSteps($steps, 'uninstall');
+        $this->registerSteps($steps, 'uninstall');
+        $this->steps = $steps;
+
+        $this->uninstallAuto();
+        $this->uninstallModule();
     }
 
     //--------------------------------------------
@@ -148,6 +153,13 @@ abstract class KaminosModule implements ProgramOutputAwareInterface, ModuleInter
                 $steps['xservices'] = "Uninstalling services";
             }
         }
+        if (true === $this->useHooks()) {
+            if ('install' === $type) {
+                $steps['hooks'] = "Installing hooks";
+            } else {
+                $steps['hooks'] = "Uninstalling hooks";
+            }
+        }
     }
 
     protected function installAuto()
@@ -164,6 +176,39 @@ abstract class KaminosModule implements ProgramOutputAwareInterface, ModuleInter
             $moduleName = 'Module\\' . $n . '\\' . $n . "Services";
             ModuleInstallTool::bindModuleServices($moduleName);
             $this->stopStep('xservices', "done");
+        }
+
+        if (true === $this->useHooks()) {
+            $this->startStep('hooks');
+            $n = $this->getModuleName();
+            $moduleName = 'Module\\' . $n . '\\' . $n . "Hooks";
+            ModuleInstallTool::bindModuleHooks($moduleName);
+            $this->stopStep('hooks', "done");
+        }
+    }
+
+    protected function uninstallAuto()
+    {
+        if (true === $this->useAutoFiles()) {
+            $this->startStep('files');
+            ModuleInstallTool::uninstallFiles($this);
+            $this->stopStep('files', "done");
+        }
+
+        if (true === $this->useXServices()) {
+            $this->startStep('xservices');
+            $n = $this->getModuleName();
+            $moduleName = 'Module\\' . $n . '\\' . $n . "Services";
+            ModuleInstallTool::unbindModuleServices($moduleName);
+            $this->stopStep('xservices', "done");
+        }
+
+        if (true === $this->useHooks()) {
+            $this->startStep('hooks');
+            $n = $this->getModuleName();
+            $moduleName = 'Module\\' . $n . '\\' . $n . "Hooks";
+            ModuleInstallTool::unbindModuleHooks($moduleName);
+            $this->stopStep('hooks', "done");
         }
     }
 
@@ -183,6 +228,14 @@ abstract class KaminosModule implements ProgramOutputAwareInterface, ModuleInter
         $d = $this->getModuleDir();
         $n = $this->getModuleName();
         $f = $d . "/$n" . "Services.php";
+        return (file_exists($f));
+    }
+
+    private function useHooks()
+    {
+        $d = $this->getModuleDir();
+        $n = $this->getModuleName();
+        $f = $d . "/$n" . "Hooks.php";
         return (file_exists($f));
     }
 
