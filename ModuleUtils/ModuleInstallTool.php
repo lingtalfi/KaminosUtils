@@ -84,9 +84,17 @@ class ModuleInstallTool
                 DirScanner::create()->scanDir($sourceAppDir, function ($path, $rPath, $level) use ($appDir) {
                     $targetEntry = $appDir . "/" . $rPath;
                     /**
-                     * Note: for now, we don't follow symlinks
+                     * For now we don't follow symlinks.
+                     * We also don't delete directories, because we could potentially
+                     * remove important app directories.
+                     * Maybe this technique will be fine-tuned as time goes by.
+                     *
                      */
-                    if (file_exists($targetEntry) && !is_link($targetEntry)) {
+                    if (
+                        file_exists($targetEntry) &&
+                        !is_link($targetEntry) &&
+                        !is_dir($targetEntry)
+                    ) {
                         FileSystemTool::remove($targetEntry);
                     }
                 });

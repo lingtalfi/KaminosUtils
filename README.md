@@ -34,6 +34,10 @@ Or otherwise just copy the planet to your planets directory.
 History Log
 ------------------
     
+- 1.2.0 -- 2017-03-27
+
+    - fix ModuleInstallTool.uninstallFiles, is now less destructive
+    
 - 1.1.0 -- 2017-03-24
 
     - added ModuleInstallTool.bindModuleServices

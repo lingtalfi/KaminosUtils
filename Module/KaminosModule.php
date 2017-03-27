@@ -59,7 +59,6 @@ abstract class KaminosModule implements ProgramOutputAwareInterface, ModuleInter
 
     public function install()
     {
-
         $steps = [];
         $this->collectAutoSteps($steps, 'install');
         $this->registerSteps($steps, 'install');
